@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package DriverPollProto;
+
+option go_package = "services.v1";
+
+service PollDriver {
+  rpc Poll(PollRequest) returns (PollResponse);
+
+  rpc ChangeMetric(ChangeMetricRequest) returns (ChangeMetricResponse);
+
+  rpc Preset(PresetRequest) returns (PresetResponse);
+}
+
+message PollRequest{
+  repeated Settings Settings = 1;
+  repeated PollItem PollItem = 2;
+}
+
+message PollResponse{
+  repeated PollValue PollValue = 1;
+}
+
+message ChangeMetricRequest {
+  Settings Settings = 1;
+  PollValue Metric = 2;
+}
+
+message ChangeMetricResponse {
+  string status = 1;
+}
+
+message PresetRequest{
+
+}
+
+message PresetResponse{
+  string preset = 1;
+}
+
+message PollItem {
+  string addr = 1;
+  string name = 2;
+}
+
+message PollValue{
+  string addr = 1;
+  string name = 2;
+  string value = 3;
+}
+
+message Settings {
+  string name = 1;
+  string value = 2;
+}
+
+
+
