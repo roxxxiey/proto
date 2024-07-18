@@ -18,158 +18,194 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// PollDriverClient is the client API for PollDriver service.
+// PollDriverServiceClient is the client API for PollDriverService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type PollDriverClient interface {
+type PollDriverServiceClient interface {
+	PollType(ctx context.Context, in *PollTypeRequest, opts ...grpc.CallOption) (*PollTypeResponse, error)
 	Poll(ctx context.Context, in *PollRequest, opts ...grpc.CallOption) (*PollResponse, error)
 	ChangeMetric(ctx context.Context, in *ChangeMetricRequest, opts ...grpc.CallOption) (*ChangeMetricResponse, error)
 	Preset(ctx context.Context, in *PresetRequest, opts ...grpc.CallOption) (*PresetResponse, error)
 }
 
-type pollDriverClient struct {
+type pollDriverServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewPollDriverClient(cc grpc.ClientConnInterface) PollDriverClient {
-	return &pollDriverClient{cc}
+func NewPollDriverServiceClient(cc grpc.ClientConnInterface) PollDriverServiceClient {
+	return &pollDriverServiceClient{cc}
 }
 
-func (c *pollDriverClient) Poll(ctx context.Context, in *PollRequest, opts ...grpc.CallOption) (*PollResponse, error) {
+func (c *pollDriverServiceClient) PollType(ctx context.Context, in *PollTypeRequest, opts ...grpc.CallOption) (*PollTypeResponse, error) {
+	out := new(PollTypeResponse)
+	err := c.cc.Invoke(ctx, "/DriverPollProto.PollDriverService/PollType", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *pollDriverServiceClient) Poll(ctx context.Context, in *PollRequest, opts ...grpc.CallOption) (*PollResponse, error) {
 	out := new(PollResponse)
-	err := c.cc.Invoke(ctx, "/DriverPollProto.PollDriver/Poll", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/DriverPollProto.PollDriverService/Poll", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *pollDriverClient) ChangeMetric(ctx context.Context, in *ChangeMetricRequest, opts ...grpc.CallOption) (*ChangeMetricResponse, error) {
+func (c *pollDriverServiceClient) ChangeMetric(ctx context.Context, in *ChangeMetricRequest, opts ...grpc.CallOption) (*ChangeMetricResponse, error) {
 	out := new(ChangeMetricResponse)
-	err := c.cc.Invoke(ctx, "/DriverPollProto.PollDriver/ChangeMetric", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/DriverPollProto.PollDriverService/ChangeMetric", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *pollDriverClient) Preset(ctx context.Context, in *PresetRequest, opts ...grpc.CallOption) (*PresetResponse, error) {
+func (c *pollDriverServiceClient) Preset(ctx context.Context, in *PresetRequest, opts ...grpc.CallOption) (*PresetResponse, error) {
 	out := new(PresetResponse)
-	err := c.cc.Invoke(ctx, "/DriverPollProto.PollDriver/Preset", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/DriverPollProto.PollDriverService/Preset", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// PollDriverServer is the server API for PollDriver service.
-// All implementations must embed UnimplementedPollDriverServer
+// PollDriverServiceServer is the server API for PollDriverService service.
+// All implementations must embed UnimplementedPollDriverServiceServer
 // for forward compatibility
-type PollDriverServer interface {
+type PollDriverServiceServer interface {
+	PollType(context.Context, *PollTypeRequest) (*PollTypeResponse, error)
 	Poll(context.Context, *PollRequest) (*PollResponse, error)
 	ChangeMetric(context.Context, *ChangeMetricRequest) (*ChangeMetricResponse, error)
 	Preset(context.Context, *PresetRequest) (*PresetResponse, error)
-	mustEmbedUnimplementedPollDriverServer()
+	mustEmbedUnimplementedPollDriverServiceServer()
 }
 
-// UnimplementedPollDriverServer must be embedded to have forward compatible implementations.
-type UnimplementedPollDriverServer struct {
+// UnimplementedPollDriverServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedPollDriverServiceServer struct {
 }
 
-func (UnimplementedPollDriverServer) Poll(context.Context, *PollRequest) (*PollResponse, error) {
+func (UnimplementedPollDriverServiceServer) PollType(context.Context, *PollTypeRequest) (*PollTypeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PollType not implemented")
+}
+func (UnimplementedPollDriverServiceServer) Poll(context.Context, *PollRequest) (*PollResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Poll not implemented")
 }
-func (UnimplementedPollDriverServer) ChangeMetric(context.Context, *ChangeMetricRequest) (*ChangeMetricResponse, error) {
+func (UnimplementedPollDriverServiceServer) ChangeMetric(context.Context, *ChangeMetricRequest) (*ChangeMetricResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangeMetric not implemented")
 }
-func (UnimplementedPollDriverServer) Preset(context.Context, *PresetRequest) (*PresetResponse, error) {
+func (UnimplementedPollDriverServiceServer) Preset(context.Context, *PresetRequest) (*PresetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Preset not implemented")
 }
-func (UnimplementedPollDriverServer) mustEmbedUnimplementedPollDriverServer() {}
+func (UnimplementedPollDriverServiceServer) mustEmbedUnimplementedPollDriverServiceServer() {}
 
-// UnsafePollDriverServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to PollDriverServer will
+// UnsafePollDriverServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PollDriverServiceServer will
 // result in compilation errors.
-type UnsafePollDriverServer interface {
-	mustEmbedUnimplementedPollDriverServer()
+type UnsafePollDriverServiceServer interface {
+	mustEmbedUnimplementedPollDriverServiceServer()
 }
 
-func RegisterPollDriverServer(s grpc.ServiceRegistrar, srv PollDriverServer) {
-	s.RegisterService(&PollDriver_ServiceDesc, srv)
+func RegisterPollDriverServiceServer(s grpc.ServiceRegistrar, srv PollDriverServiceServer) {
+	s.RegisterService(&PollDriverService_ServiceDesc, srv)
 }
 
-func _PollDriver_Poll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PollDriverService_PollType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PollTypeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PollDriverServiceServer).PollType(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/DriverPollProto.PollDriverService/PollType",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PollDriverServiceServer).PollType(ctx, req.(*PollTypeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PollDriverService_Poll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PollRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PollDriverServer).Poll(ctx, in)
+		return srv.(PollDriverServiceServer).Poll(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/DriverPollProto.PollDriver/Poll",
+		FullMethod: "/DriverPollProto.PollDriverService/Poll",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PollDriverServer).Poll(ctx, req.(*PollRequest))
+		return srv.(PollDriverServiceServer).Poll(ctx, req.(*PollRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PollDriver_ChangeMetric_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PollDriverService_ChangeMetric_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ChangeMetricRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PollDriverServer).ChangeMetric(ctx, in)
+		return srv.(PollDriverServiceServer).ChangeMetric(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/DriverPollProto.PollDriver/ChangeMetric",
+		FullMethod: "/DriverPollProto.PollDriverService/ChangeMetric",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PollDriverServer).ChangeMetric(ctx, req.(*ChangeMetricRequest))
+		return srv.(PollDriverServiceServer).ChangeMetric(ctx, req.(*ChangeMetricRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PollDriver_Preset_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PollDriverService_Preset_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PresetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PollDriverServer).Preset(ctx, in)
+		return srv.(PollDriverServiceServer).Preset(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/DriverPollProto.PollDriver/Preset",
+		FullMethod: "/DriverPollProto.PollDriverService/Preset",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PollDriverServer).Preset(ctx, req.(*PresetRequest))
+		return srv.(PollDriverServiceServer).Preset(ctx, req.(*PresetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// PollDriver_ServiceDesc is the grpc.ServiceDesc for PollDriver service.
+// PollDriverService_ServiceDesc is the grpc.ServiceDesc for PollDriverService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var PollDriver_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "DriverPollProto.PollDriver",
-	HandlerType: (*PollDriverServer)(nil),
+var PollDriverService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "DriverPollProto.PollDriverService",
+	HandlerType: (*PollDriverServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "PollType",
+			Handler:    _PollDriverService_PollType_Handler,
+		},
+		{
 			MethodName: "Poll",
-			Handler:    _PollDriver_Poll_Handler,
+			Handler:    _PollDriverService_Poll_Handler,
 		},
 		{
 			MethodName: "ChangeMetric",
-			Handler:    _PollDriver_ChangeMetric_Handler,
+			Handler:    _PollDriverService_ChangeMetric_Handler,
 		},
 		{
 			MethodName: "Preset",
-			Handler:    _PollDriver_Preset_Handler,
+			Handler:    _PollDriverService_Preset_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

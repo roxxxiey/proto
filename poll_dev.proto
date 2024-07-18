@@ -4,30 +4,57 @@ package DriverPollProto;
 
 option go_package = "services.v1";
 
-service PollDriver {
-  rpc Poll(PollRequest) returns (PollResponse);
+service PollDriverService{
+  rpc PollType(PollTypeRequest)
+          returns (PollTypeResponse);
 
-  rpc ChangeMetric(ChangeMetricRequest) returns (ChangeMetricResponse);
+  rpc Poll(PollRequest)
+          returns (PollResponse);
 
-  rpc Preset(PresetRequest) returns (PresetResponse);
+  rpc ChangeMetric(ChangeMetricRequest)
+          returns (ChangeMetricResponse);
+
+  rpc Preset(PresetRequest)
+          returns (PresetResponse);
 }
 
-message PollRequest{
+message PollTypeRequest {
+
+}
+
+message PollTypeResponse {
+  string type = 1;
+}
+
+message ChangeMetricRequest {
   repeated Settings Settings = 1;
   repeated PollItem PollItem = 2;
 }
 
-message PollResponse{
-  repeated PollValue PollValue = 1;
-}
-
-message ChangeMetricRequest {
-  Settings Settings = 1;
-  PollValue Metric = 2;
-}
-
 message ChangeMetricResponse {
   string status = 1;
+}
+
+message PollRequest{
+  repeated Settings Settings = 1;
+  repeated PollItem PollItems = 2;
+}
+
+message PollResponse{
+  string status = 1;
+  repeated PollItem PollItem= 2;
+}
+
+message PollItem{
+  string name = 1;
+  string addr = 2;
+  string desc = 3;
+  optional string value = 4;
+}
+
+message Settings {
+  string name = 1;
+  string value = 2;
 }
 
 message PresetRequest{
@@ -36,22 +63,6 @@ message PresetRequest{
 
 message PresetResponse{
   string preset = 1;
-}
-
-message PollItem {
-  string addr = 1;
-  string name = 2;
-}
-
-message PollValue{
-  string addr = 1;
-  string name = 2;
-  string value = 3;
-}
-
-message Settings {
-  string name = 1;
-  string value = 2;
 }
 
 
